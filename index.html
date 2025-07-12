@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESAT Diagnostic Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div id="test-container" class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
+    <div id="start-screen" class="text-center">
+      <h1 class="text-2xl font-bold mb-4">ESAT Diagnostic Test</h1>
+      <p class="mb-4">This 30-question test is highly time-pressured (60 seconds per question) to identify gaps in your knowledge. You cannot go back to previous questions. Write answers on paper and submit via email to edwardtownsend2003@gmail.com.</p>
+      <p class="mb-4">The number of questions on each topic is proportional to the typical number of questions on that topic in the ESAT.</p>
+      <p class="mb-4">You might need to zoom in to read some questions!</p> 
+      <p class="mb-4">Click Start to begin!</p>
+      <button id="start-btn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Start</button>
+    </div>
+    <div id="question-screen" class="hidden">
+      <div class="flex justify-between mb-4">
+        <h2 id="question-number" class="text-lg font-semibold"></h2>
+        <div id="timer" class="text-lg font-semibold text-red-500">60</div>
+      </div>
+      <img id="question-image" class="w-full h-auto max-h-96 object-contain mb-4" src="" alt="Question">
+    </div>
+    <div id="end-screen" class="hidden text-center">
+      <h2 class="text-2xl font-bold mb-4">Test Complete</h2>
+      <p class="mb-4">Submit your answer sheet via email to edwardtownsend2003@gmail.com</p>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      { id: 1, image: "questions/q1.png", topic: "Mechanics" },
+      { id: 2, image: "questions/q2.png", topic: "Mechanics" },
+      { id: 3, image: "questions/q3.png", topic: "Mechanics" },
+      { id: 4, image: "questions/q4.png", topic: "Mechanics" },
+      { id: 5, image: "questions/q5.png", topic: "Mechanics" },
+      { id: 6, image: "questions/q6.png", topic: "Mechanics" },
+      { id: 7, image: "questions/q7.png", topic: "Mechanics" },
+      { id: 8, image: "questions/q8.png", topic: "Geometry+Coord Geometry" },
+      { id: 9, image: "questions/q9.png", topic: "Geometry+Coord Geometry" },
+      { id: 10, image: "questions/q10.png", topic: "Geometry+Coord Geometry" },
+      { id: 11, image: "questions/q11.png", topic: "Geometry+Coord Geometry" },
+      { id: 12, image: "questions/q12.png", topic: "Geometry+Coord Geometry" },
+      { id: 13, image: "questions/q13.png", topic: "Algebra and Functions" },
+      { id: 14, image: "questions/q14.png", topic: "Algebra and Functions" },
+      { id: 15, image: "questions/q15.png", topic: "Algebra and Functions" },
+      { id: 16, image: "questions/q16.png", topic: "Algebra and Functions" },
+      { id: 17, image: "questions/q17.png", topic: "Electricity" },
+      { id: 18, image: "questions/q18.png", topic: "Electricity" },
+      { id: 19, image: "questions/q19.png", topic: "Electricity" },
+      { id: 20, image: "questions/q20.png", topic: "Waves" },
+      { id: 21, image: "questions/q21.png", topic: "Waves" },
+      { id: 22, image: "questions/q22.png", topic: "Calculus" },
+      { id: 23, image: "questions/q23.png", topic: "Calculus" },
+      { id: 24, image: "questions/q24.png", topic: "Magnetism" },
+      { id: 25, image: "questions/q25.png", topic: "Numbers" },
+      { id: 26, image: "questions/q26.png", topic: "Ratio and Proportion" },
+      { id: 27, image: "questions/q27.png", topic: "Sequences and Series" },
+      { id: 28, image: "questions/q28.png", topic: "Trigonometry" },
+      { id: 29, image: "questions/q29.png", topic: "Thermal Physics" },
+      { id: 30, image: "questions/q30.png", topic: "Exponentials and Logs" },
+    ];
+
+    let currentQuestion = 0;
+    let timer;
+    const timeLimit = 60; // 60 seconds per question
+
+    const startScreen = document.getElementById('start-screen');
+    const questionScreen = document.getElementById('question-screen');
+    const endScreen = document.getElementById('end-screen');
+    const startBtn = document.getElementById('start-btn');
+    const questionNumber = document.getElementById('question-number');
+    const questionImage = document.getElementById('question-image');
+    const timerDiv = document.getElementById('timer');
+
+    startBtn.addEventListener('click', startTest);
+
+    function startTest() {
+      startScreen.classList.add('hidden');
+      questionScreen.classList.remove('hidden');
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentQuestion >= questions.length) {
+        endTest();
+        return;
+      }
+      const q = questions[currentQuestion];
+      questionNumber.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+      questionImage.src = q.image;
+      startTimer();
+    }
+
+    function startTimer() {
+      let timeLeft = timeLimit;
+      timerDiv.textContent = timeLeft;
+      timer = setInterval(() => {
+        timeLeft--;
+        timerDiv.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          currentQuestion++;
+          loadQuestion();
+        }
+      }, 1000);
+    }
+
+    function endTest() {
+      questionScreen.classList.add('hidden');
+      endScreen.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
