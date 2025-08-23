@@ -5,9 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ESAT Diagnostic Test</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      width: 100vw;
+      overflow-x: hidden;
+    }
+    
+    #test-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #question-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #question-image {
+      flex: 1;
+      min-height: 0;
+    }
+    
+    @media (max-width: 768px) {
+      #test-container {
+        padding: 1rem;
+        margin: 0;
+        border-radius: 0;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-  <div id="test-container" class="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl">
+<body class="bg-gray-100 min-h-screen">
+
+
+  <div id="test-container" class="bg-white p-6 rounded-lg shadow-lg w-full max-w-6xl mx-auto min-h-screen transition-all duration-300">
     <div id="start-screen" class="text-center">
       <h1 class="text-2xl font-bold mb-4">ESAT Diagnostic Test</h1>
       <p class="mb-4">This 30-question test is highly time-pressured (60 seconds per question) to identify gaps in your knowledge. You cannot go back to previous questions. Write answers on paper and submit via email to edwardtownsend2003@gmail.com.</p>
@@ -21,7 +57,16 @@
         <h2 id="question-number" class="text-lg font-semibold"></h2>
         <div id="timer" class="text-lg font-semibold text-red-500">60</div>
       </div>
-      <img id="question-image" class="w-full h-auto max-h-96 object-contain mb-4" src="" alt="Question">
+      <img id="question-image" class="w-full h-auto max-h-[70vh] object-contain mb-4" src="" alt="Question">
+      <!-- Warning message that appears at 10 seconds -->
+      <div id="warning-message" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+          </svg>
+          <strong>10 seconds left! Make your best guess now!</strong>
+        </div>
+      </div>
     </div>
     <div id="end-screen" class="hidden text-center">
       <h2 class="text-2xl font-bold mb-4">Test Complete</h2>
@@ -65,7 +110,8 @@
 
     let currentQuestion = 0;
     let timer;
-    const timeLimit = 60; // 60 seconds per question
+    const timeLimit = 80; // 90 seconds per question
+    let warningShown = false;
 
     const startScreen = document.getElementById('start-screen');
     const questionScreen = document.getElementById('question-screen');
@@ -74,8 +120,33 @@
     const questionNumber = document.getElementById('question-number');
     const questionImage = document.getElementById('question-image');
     const timerDiv = document.getElementById('timer');
+    const warningMessage = document.getElementById('warning-message');
+    const testContainer = document.getElementById('test-container');
 
     startBtn.addEventListener('click', startTest);
+
+    // Function to create a beep sound
+    function playBeep() {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+    
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(1000, audioContext.currentTime); // slightly higher pitch
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(1.0, audioContext.currentTime); // louder
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0); // longer
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 2.0);
+      } catch (e) {
+        console.log('Audio not supported:', e);
+      }
+    }
 
     function startTest() {
       startScreen.classList.add('hidden');
@@ -91,6 +162,9 @@
       const q = questions[currentQuestion];
       questionNumber.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
       questionImage.src = q.image;
+      warningShown = false;
+      warningMessage.classList.add('hidden');
+      testContainer.classList.remove('bg-yellow-50', 'border-2', 'border-yellow-300');
       startTimer();
     }
 
@@ -100,12 +174,36 @@
       timer = setInterval(() => {
         timeLeft--;
         timerDiv.textContent = timeLeft;
+        
+        // Show warning at 10 seconds remaining
+        if (timeLeft === 10 && !warningShown) {
+          showWarning();
+        }
+        
         if (timeLeft <= 0) {
           clearInterval(timer);
           currentQuestion++;
           loadQuestion();
         }
       }, 1000);
+    }
+
+    function showWarning() {
+      warningShown = true;
+      
+      // Play beep sound
+      playBeep();
+      
+      // Show warning message
+      warningMessage.classList.remove('hidden');
+      
+      // Change background to yellow
+      testContainer.classList.add('bg-yellow-50', 'border-2', 'border-yellow-300');
+      
+      // Flash timer in red
+      timerDiv.classList.add('animate-pulse', 'text-red-600');
+      
+      // Warning stays until question ends - no auto-remove
     }
 
     function endTest() {

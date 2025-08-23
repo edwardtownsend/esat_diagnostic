@@ -1,0 +1,13 @@
+[
+    {
+        "id": "Q1",
+        "topic": "mechanics",
+        "question_text": "A suitcase weighing 200 N is placed on a weighing scale in a lift. The scale reads 180 N when the lift is moving. The lift is",
+        "question_image": null,
+        "options": ["moving downward at constant velocity", "moving down with a decreasing velocity", "moving up at a constant velcoity", "moving up with decreasing velocity"],
+        "correct_index": 4,
+        "difficulty": "easy",
+        "explanation": ""
+      }
+  ]
+  
